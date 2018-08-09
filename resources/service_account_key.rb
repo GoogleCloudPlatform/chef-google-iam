@@ -66,8 +66,8 @@ module Google
       property :valid_before_time,
                Time, coerce: ::Google::Iam::Property::Time.coerce, desired_state: true
       property :service_account,
-               [String, ::Google::Iam::Data::ServiAccouNameRef],
-               coerce: ::Google::Iam::Property::ServiAccouNameRef.coerce, desired_state: true
+               [String, ::Google::Iam::Data::ServiceAccountNameRef],
+               coerce: ::Google::Iam::Property::ServiceAccountNameRef.coerce, desired_state: true
       property :path, String, coerce: ::Google::Iam::Property::String.coerce, desired_state: true
       property :key_id, String, coerce: ::Google::Iam::Property::String.coerce, desired_state: true
       property :fail_if_mismatch,
@@ -84,7 +84,7 @@ module Google
           req = ::Google::Iam::Network::Get.new(
             self_link(service_account: @new_resource.service_account,
                       project: @new_resource.project, key_id: key_id),
-            fetch_auth(resource)
+            fetch_auth(@new_resource)
           )
           fetch = return_if_object req.send
           unless fetch.nil?
@@ -135,7 +135,7 @@ module Google
         fetch = fetch_resource(@new_resource, self_link(@new_resource))
         unless fetch.nil?
           converge_by "Deleting giam_service_account_key[#{new_resource.name}]" do
-            (_, key_id) = get_key_id(resource)
+            (_, key_id) = get_key_id(@new_resource)
             delete_req = ::Google::Iam::Network::Delete.new(
               self_link(service_account: @new_resource.service_account,
                         project: @new_resource.project, key_id: key_id),
